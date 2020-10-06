@@ -14,3 +14,6 @@ pkgutil --pkgs | while read x; do (pkgutil --pkg-info $x; echo ""); done > ./pkg
 
 zip -r IntuneMacODC.zip ./pkgutil_pkgs.txt
 zip -r IntuneMacODC.zip ./pkgutil_info.txt
+
+
+open .
