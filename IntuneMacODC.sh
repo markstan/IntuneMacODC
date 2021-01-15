@@ -10,6 +10,7 @@ cd odc
 
 sw_vers > ./sw_vers.txt
 zip -r IntuneMacODC.zip ./sw_vers.txt
+
 uname -a > ./uname_a.txt
 zip -r IntuneMacODC.zip ./uname_a.txt
 
@@ -40,6 +41,7 @@ zip -r IntuneMacODC.zip ~/Library/Logs/Company\ Portal/*
 zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/Intune
 zip -r IntuneMacODC.zip /var/log/*
 zip -r IntunemacODC.zip /Library/Logs/Microsoft/Intune
+zip -r jamfAAD.zip /usr/local/jamf/bin/jamfAAD
 
 # pkg utilities
 #
@@ -51,11 +53,21 @@ pkgutil --pkgs | while read x; do (pkgutil --pkg-info $x; echo -e ""); done > ./
 zip -r IntuneMacODC.zip ./pkgutil_pkgs.txt
 zip -r IntuneMacODC.zip ./pkgutil_info.txt
 
-log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./downloadd.log
-zip -r IntuneMacODC.zip ./downloadd.log
 
-log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./intunesyslog.log
-zip -r IntuneMacODC.zip ./intunesyslog.log
+# Syslogs
+log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./syslog_downloadd.log
+zip -r IntuneMacODC.zip ./syslog_downloadd.log
+
+log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
+zip -r IntuneMacODC.zip ./syslog_intune.log
+
+if [ -f /usr/local/jamf/bin/jamfAAD ]; then
+	log show -style syslog --info --debug --predicate 'subsystem CONTAINS "jamfAAD"' --last 30d >> ./syslog_jamfAAD.log
+	zip -r IntuneMacODC.zip ./syslog_jamfAAD.log
+else
+	echo -e "/usr/local/jamf/bin/jamfAAD not found, skipping JAMF" >> ./syslog_jamfAAD.log
+fi
+
 
 # System Report - double-click to open utility
 /usr/sbin/system_profiler -detailLevel full -xml > ./SystemReport.spx 2>/dev/null
@@ -87,7 +99,12 @@ echo -e "/usr/libexec/mdmclient dumpSCEPVars\n**************************\n\n" > 
 /usr/libexec/mdmclient dumpSCEPVars >> ./dumpSCEPVars.txt
 zip -r IntuneMacODC.zip ./dumpSCEPVars.txt
 
-
+if [ -f /usr/local/jamf/bin/jamfAAD ]; then
+	echo -e "/usr/local/jamf/bin/jamfAAD gatherAADInfo\n\n\n" > ./jamfAAD-gatherAADInfo.txt
+	/usr/local/jamf/bin/jamfAAD gatherAADInfo  >> ./jamfAAD-gatherAADInfo.txt
+else
+	echo -e "/usr/local/jamf/bin/jamfAAD not found, skipping JAMF" >> ./jamfAAD-gatherAADInfo.txt
+fi
 
 # cleanup
 rm ./SystemReport.spx
