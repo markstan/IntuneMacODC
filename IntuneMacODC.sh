@@ -41,8 +41,8 @@ zip -r IntuneMacODC.zip ~/Library/Logs/Company\ Portal/*
 zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/Intune
 zip -r IntuneMacODC.zip /var/log/*
 zip -r IntunemacODC.zip /Library/Logs/Microsoft/Intune
-zip -r jamfAAD.zip /usr/local/jamf/bin/jamfAAD
-zip -r CrashLogs.zip ~/Library/Logs/DiagnosticReports/*
+zip -r IntunemacODC.zip /usr/local/jamf/bin/jamfAAD
+zip -r IntunemacODC.zip ~/Library/Logs/DiagnosticReports/*
 
 # pkg utilities
 #
