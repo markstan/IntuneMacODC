@@ -42,6 +42,7 @@ zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/Intune
 zip -r IntuneMacODC.zip /var/log/*
 zip -r IntunemacODC.zip /Library/Logs/Microsoft/Intune
 zip -r jamfAAD.zip /usr/local/jamf/bin/jamfAAD
+zip -r CrashLogs ~/Library/Logs/DiagnosticReports/*
 
 # pkg utilities
 #
