@@ -114,10 +114,13 @@ echo -e "/usr/libexec/mdmclient QueryDeviceInformation\n************************
 /usr/libexec/mdmclient QueryDeviceInformation >> ./QueryDeviceInformation.txt
 zip -r IntuneMacODC.zip ./QueryDeviceInformation.txt
 
+echo -e "/usr/libexec/mdmclient QueryInstalledApps\n**************************\n\n" > ./QueryInstalledApps.txt
+/usr/libexec/mdmclient QueryInstalledApps >> ./QueryInstalledApps.txt
+zip -r IntuneMacODC.zip ./QueryInstalledApps.txt
 
 echo -e "/usr/libexec/mdmclient QuerySecurityInfo\n**************************\n\n" > ./QuerySecurityInfo.txt
 /usr/libexec/mdmclient QuerySecurityInfo >> ./QuerySecurityInfo.txt
-zip -r IntuneMacODC.zip ./QueryDeviceInformation.txt
+zip -r IntuneMacODC.zip ./QuerySecurityInfo.txt
 
 echo -e "/usr/libexec/mdmclient dumpSCEPVars\n**************************\n\n" > ./dumpSCEPVars.txt
 /usr/libexec/mdmclient dumpSCEPVars >> ./dumpSCEPVars.txt
