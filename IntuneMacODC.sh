@@ -41,7 +41,7 @@ zip -r IntuneMacODC.zip ~/Library/Logs/Company\ Portal/*
 zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/*
 zip -r IntuneMacODC.zip /var/log/*
 zip -r IntunemacODC.zip /Library/Logs/Microsoft/*
-zip -r IntunemacODC.zip /usr/local/jamf/bin/jamfAAD
+zip -r IntunemacODC.zip /usr/local/jamf/bin/jamfAAD/*
 zip -r IntunemacODC.zip ~/Library/Logs/DiagnosticReports/*
 
 # pkg utilities
@@ -70,14 +70,37 @@ else
 fi
 
 
+#######################################################################################
 # System Report - double-click to open utility
+#
+
 /usr/sbin/system_profiler -detailLevel full -xml > ./SystemReport.spx 2>/dev/null
 zip -r IntuneMacODC.zip ./SystemReport.spx
 
-echo -e "/usr/libexec/mdmclient QueryInstalledApps\n**************************\n\n" > ./QueryInstalledApps.txt
-/usr/libexec/mdmclient QueryInstalledApps >> ./QueryInstalledApps.txt
-zip -r IntuneMacODC.zip ./QueryInstalledApps.txt
+#######################################################################################
+# Profiles Data
+#
+echo -e "profiles status\n**************************\n\n" > ./IntuneProfiles.txt
+profiles status >> .//IntuneProfiles.txt
 
+echo -e "profiles list\n**************************\n\n" > ./IntuneProfiles.txt
+profiles list >> .//IntuneProfiles.txt
+
+echo -e "profiles list -verbose -all\n**************************\n\n" > ./IntuneProfiles.txt
+profiles list >> .//IntuneProfiles.txt
+
+echo -e "profiles show\n**************************\n\n" > ./IntuneProfiles.txt
+profiles show >> .//IntuneProfiles.txt
+
+echo -e "profiles show -all -verbose\n**************************\n\n" > ./IntuneProfiles.txt
+profiles show -all -verbose >> .//IntuneProfiles.txt
+
+
+zip -r IntuneMacODC.zip ./IntuneProfiles.txt
+
+#######################################################################################
+# mdmclient commands
+#
 echo -e "/usr/libexec/mdmclient QueryInstalledProfiles\n**************************\n\n" > ./QueryInstalledProfiles.txt
 /usr/libexec/mdmclient QueryInstalledProfiles >> ./QueryInstalledProfiles.txt
 zip -r IntuneMacODC.zip ./QueryInstalledProfiles.txt
