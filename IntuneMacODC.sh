@@ -38,9 +38,9 @@ zip -r IntuneMacODC.zip ./profiles.txt
 
 # Gather log directories 
 zip -r IntuneMacODC.zip ~/Library/Logs/Company\ Portal/*
-zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/Intune
+zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/*
 zip -r IntuneMacODC.zip /var/log/*
-zip -r IntunemacODC.zip /Library/Logs/Microsoft/Intune
+zip -r IntunemacODC.zip /Library/Logs/Microsoft/*
 zip -r IntunemacODC.zip /usr/local/jamf/bin/jamfAAD
 zip -r IntunemacODC.zip ~/Library/Logs/DiagnosticReports/*
 
