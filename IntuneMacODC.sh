@@ -59,7 +59,7 @@ zip -r IntuneMacODC.zip ./pkgutil_info.txt
 log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./syslog_downloadd.log
 zip -r IntuneMacODC.zip ./syslog_downloadd.log
 
-log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
+log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || process CONTAINS[c] "appstore" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
 zip -r IntuneMacODC.zip ./syslog_intune.log
 
 if [ -f /usr/local/jamf/bin/jamfAAD ]; then
