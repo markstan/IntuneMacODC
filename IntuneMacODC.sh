@@ -133,6 +133,16 @@ else
 	echo -e "/usr/local/jamf/bin/jamfAAD not found, skipping JAMF" >> ./jamfAAD-gatherAADInfo.txt
 fi
 
+#######################################################################################
+# Process info
+#
+echo -e "ps -A -o pid,comm,args\n**************************\n\n" > ./Processes.txt
+ps -A -o pid,comm,args >> ./Processes.txt
+
+echo -e "ps -A\n**************************\n\n" >> ./Processes.txt
+ps -A >> ./Processes.txt
+zip -r IntuneMacODC.zip ./Processes.txt
+
 # cleanup
 rm ./SystemReport.spx
 rm ./*.txt
