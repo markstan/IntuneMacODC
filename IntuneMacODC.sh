@@ -143,6 +143,14 @@ echo -e "ps -A\n**************************\n\n" >> ./Processes.txt
 ps -A >> ./Processes.txt
 zip -r IntuneMacODC.zip ./Processes.txt
 
+echo "last reboot\n************************************\n\n" > ./Reboot_History.txt
+last reboot > ./Reboot_History.txt
+zip -r IntuneMacODC.zip ./Reboot_History.txt
+
+echo "last\n************************************\n\n" > ./Last_Output.txt
+last > ./Last_Output.txt
+zip -r IntuneMacODC.zip ./Last_Output.txt
+
 # cleanup
 rm ./SystemReport.spx
 rm ./*.txt
