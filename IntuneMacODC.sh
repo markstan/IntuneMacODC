@@ -60,8 +60,12 @@ zip -r IntuneMacODC.zip ./pkgutil_info.txt
 log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./syslog_downloadd.log
 zip -r IntuneMacODC.zip ./syslog_downloadd.log
 
-log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || process CONTAINS[c] "appstore" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
+log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || eventMessage CONTAINS[c] "Intune" || process CONTAINS[c] "appstore" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
 zip -r IntuneMacODC.zip ./syslog_intune.log
+
+# Push Notifications (APNS)
+log show --style syslog --info --debug --predicate 'process CONTAINS[c] "apsd" || eventMessage CONTAINS[c] "apsd"  ' --last 30d >> ./syslog_apns.log
+zip -r IntuneMacODC.zip ./syslog_apns.log
 
 if [ -f /usr/local/jamf/bin/jamfAAD ]; then
 	log show -style syslog --info --debug --predicate 'subsystem CONTAINS "jamfAAD"' --last 30d >> ./syslog_jamfAAD.log
