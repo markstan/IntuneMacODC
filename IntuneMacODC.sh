@@ -58,7 +58,7 @@ zip -r $ODCFILENAME /var/log/*
 zip -r $ODCFILENAME /Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/Intune/SideCar
 zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
-zip -r $ODCFILENAME ~/Library/Logs/DiagnosticReports/*
+zip -r $ODCFILENAME ~/Library/Logs/DiagnosticReports/* -x "*Siri*"
 
 # pkg utilities
 #
