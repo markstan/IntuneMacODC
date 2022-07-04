@@ -1,18 +1,32 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-if [ "$EUID" -ne 0 ]
-  then echo -e "Please run using 'sudo ./IntuneMacODC.sh'"
-  exit
+if [[ $1 == "-Debug" || $1 == "-debug" || $1 == "-d" || $1 == "-D"  ]]
+        then 
+	    set -x
+	    echo "Debug mode enabled"
 fi
 
-mkdir odc
+HOSTNAME=`scutil --get LocalHostName`
+NOW=`date +%Y-%m-%dT%H:%M:%S%z`
+ODCFILENAME="$HOSTNAME-IntuneMacODC-$NOW.zip"
+
+if [ "$EUID" -ne 0 ]
+    then echo -e "Please run using 'sudo ./IntuneMacODC.sh'"
+    exit
+fi
+
+echo "Creating odc working directory"
+if [ ! -d odc ]
+   then mkdir odc
+fi
+pushd .
 cd odc
 
 sw_vers > ./sw_vers.txt
-zip -r IntuneMacODC.zip ./sw_vers.txt
+zip -r $ODCFILENAME ./sw_vers.txt
 
 uname -a > ./uname_a.txt
-zip -r IntuneMacODC.zip ./uname_a.txt
+zip -r $ODCFILENAME ./uname_a.txt
 
 echo -e "************************\n" >> ./profiles.txt
 echo -e "profiles status\n\n" >> ./profiles.txt
@@ -34,54 +48,57 @@ echo -e "************************\n" >> ./profiles.txt
 echo -e "profiles show -verbose\n\n" >> ./profiles.txt
 profiles show -verbose >> ./profiles.txt
 
-zip -r IntuneMacODC.zip ./profiles.txt
+zip -r $ODCFILENAME ./profiles.txt
 
+echo "Collecting logs"
 # Gather log directories 
-zip -r IntuneMacODC.zip ~/Library/Logs/Company\ Portal/*
-zip -r IntuneMacODC.zip ~/Library/Logs/Microsoft/*
-zip -r IntuneMacODC.zip /var/log/*
-zip -r IntunemacODC.zip /Library/Logs/Microsoft/*
-zip -r IntunemacODC.zip /Library/Application\ Support/Microsoft/Intune/SideCar
-zip -r IntunemacODC.zip /usr/local/jamf/bin/jamfAAD/*
-zip -r IntunemacODC.zip ~/Library/Logs/DiagnosticReports/*
+zip -r $ODCFILENAME ~/Library/Logs/Company\ Portal/*
+zip -r $ODCFILENAME ~/Library/Logs/Microsoft/*
+zip -r $ODCFILENAME /var/log/*
+zip -r $ODCFILENAME /Library/Logs/Microsoft/*
+zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/Intune/SideCar
+zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
+zip -r $ODCFILENAME ~/Library/Logs/DiagnosticReports/*
 
 # pkg utilities
 #
 #
 
 pkgutil --pkgs > ./pkgutil_pkgs.txt
-pkgutil --pkgs | while read x; do (pkgutil --pkg-info $x; echo -e ""); done > ./pkgutil_info.txt
+pkgutil --pkgs | grep - v com.apple.pkg.MAContent10 | while read x; do (pkgutil --pkg-info $x; echo -e ""); done > ./pkgutil_info.txt
 
-zip -r IntuneMacODC.zip ./pkgutil_pkgs.txt
-zip -r IntuneMacODC.zip ./pkgutil_info.txt
+zip -r $ODCFILENAME ./pkgutil_pkgs.txt
+zip -r $ODCFILENAME ./pkgutil_info.txt
 
+echo "Gathering syslogs.  This may take a minute."
 
 # Syslogs
 log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./syslog_downloadd.log
-zip -r IntuneMacODC.zip ./syslog_downloadd.log
+zip -r $ODCFILENAME ./syslog_downloadd.log
 
 log show --style syslog --info --debug  --predicate 'process BEGINSWITH "Intune" || eventMessage CONTAINS[c] "Intune" || process CONTAINS[c] "appstore" || process CONTAINS[c] "downloadd" || process CONTAINS "mdm" ' --last 30d  >> ./syslog_intune.log
-zip -r IntuneMacODC.zip ./syslog_intune.log
+zip -r $ODCFILENAME ./syslog_intune.log
 
 # Push Notifications (APNS)
 log show --style syslog --info --debug --predicate 'process CONTAINS[c] "apsd" || eventMessage CONTAINS[c] "apsd"  ' --last 30d >> ./syslog_apns.log
-zip -r IntuneMacODC.zip ./syslog_apns.log
+zip -r $ODCFILENAME ./syslog_apns.log
 
-if [ -f /usr/local/jamf/bin/jamfAAD ]; then
+if [ -d /usr/local/jamf/bin/jamfAAD ]; then
 	log show -style syslog --info --debug --predicate 'subsystem CONTAINS "jamfAAD"' --last 30d >> ./syslog_jamfAAD.log
-	zip -r IntuneMacODC.zip ./syslog_jamfAAD.log
 else
 	echo -e "/usr/local/jamf/bin/jamfAAD not found, skipping JAMF" >> ./syslog_jamfAAD.log
 fi
+zip -r $ODCFILENAME ./syslog_jamfAAD.log
 
-
+echo "Gathering system profiler"
 #######################################################################################
 # System Report - double-click to open utility
 #
 
 /usr/sbin/system_profiler -detailLevel full -xml > ./SystemReport.spx 2>/dev/null
-zip -r IntuneMacODC.zip ./SystemReport.spx
+zip -r $ODCFILENAME ./SystemReport.spx
 
+echo "Gathering profiles data"
 #######################################################################################
 # Profiles Data
 #
@@ -101,35 +118,35 @@ echo -e "profiles show -all -verbose\n**************************\n\n" > ./Intune
 profiles show -all -verbose >> .//IntuneProfiles.txt
 
 
-zip -r IntuneMacODC.zip ./IntuneProfiles.txt
+zip -r $ODCFILENAME ./IntuneProfiles.txt
 
 #######################################################################################
 # mdmclient commands
 #
 echo -e "/usr/libexec/mdmclient QueryInstalledProfiles\n**************************\n\n" > ./QueryInstalledProfiles.txt
 /usr/libexec/mdmclient QueryInstalledProfiles >> ./QueryInstalledProfiles.txt
-zip -r IntuneMacODC.zip ./QueryInstalledProfiles.txt
+zip -r $ODCFILENAME ./QueryInstalledProfiles.txt
 
 
 echo -e "/usr/libexec/mdmclient QueryCertificates\n**************************\n\n" > ./QueryCertificates.txt
 /usr/libexec/mdmclient QueryCertificates >> ./QueryCertificates.txt
-zip -r IntuneMacODC.zip ./QueryCertificates.txt
+zip -r $ODCFILENAME ./QueryCertificates.txt
 
 echo -e "/usr/libexec/mdmclient QueryDeviceInformation\n**************************\n\n" > ./QueryDeviceInformation.txt
 /usr/libexec/mdmclient QueryDeviceInformation >> ./QueryDeviceInformation.txt
-zip -r IntuneMacODC.zip ./QueryDeviceInformation.txt
+zip -r $ODCFILENAME ./QueryDeviceInformation.txt
 
 echo -e "/usr/libexec/mdmclient QueryInstalledApps\n**************************\n\n" > ./QueryInstalledApps.txt
 /usr/libexec/mdmclient QueryInstalledApps >> ./QueryInstalledApps.txt
-zip -r IntuneMacODC.zip ./QueryInstalledApps.txt
+zip -r $ODCFILENAME ./QueryInstalledApps.txt
 
 echo -e "/usr/libexec/mdmclient QuerySecurityInfo\n**************************\n\n" > ./QuerySecurityInfo.txt
 /usr/libexec/mdmclient QuerySecurityInfo >> ./QuerySecurityInfo.txt
-zip -r IntuneMacODC.zip ./QuerySecurityInfo.txt
+zip -r $ODCFILENAME ./QuerySecurityInfo.txt
 
 echo -e "/usr/libexec/mdmclient dumpSCEPVars\n**************************\n\n" > ./dumpSCEPVars.txt
 /usr/libexec/mdmclient dumpSCEPVars >> ./dumpSCEPVars.txt
-zip -r IntuneMacODC.zip ./dumpSCEPVars.txt
+zip -r $ODCFILENAME ./dumpSCEPVars.txt
 
 if [ -f /usr/local/jamf/bin/jamfAAD ]; then
 	echo -e "/usr/local/jamf/bin/jamfAAD gatherAADInfo\n\n\n" > ./jamfAAD-gatherAADInfo.txt
@@ -146,15 +163,15 @@ ps -A -o pid,comm,args >> ./Processes.txt
 
 echo -e "ps -A\n**************************\n\n" >> ./Processes.txt
 ps -A >> ./Processes.txt
-zip -r IntuneMacODC.zip ./Processes.txt
+zip -r $ODCFILENAME ./Processes.txt
 
 echo "last reboot\n************************************\n\n" > ./Reboot_History.txt
 last reboot > ./Reboot_History.txt
-zip -r IntuneMacODC.zip ./Reboot_History.txt
+zip -r $ODCFILENAME ./Reboot_History.txt
 
 echo "last\n************************************\n\n" > ./Last_Output.txt
 last > ./Last_Output.txt
-zip -r IntuneMacODC.zip ./Last_Output.txt
+zip -r $ODCFILENAME ./Last_Output.txt
 
 # cleanup
 rm ./SystemReport.spx
@@ -163,3 +180,5 @@ rm ./*.log
 
 # display window in Finder
 open .
+# return to original path
+popd
