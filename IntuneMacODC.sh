@@ -7,7 +7,7 @@ if [[ $1 == "-Debug" || $1 == "-debug" || $1 == "-d" || $1 == "-D"  ]]
 fi
 
 HOSTNAME=`scutil --get LocalHostName`
-NOW=`date +%Y-%m-%dT%H:%M:%S%z`
+NOW=`date +%Y-%m-%dT%H-%M-%S%z`
 ODCFILENAME="$HOSTNAME-IntuneMacODC-$NOW.zip"
 
 if [ "$EUID" -ne 0 ]
