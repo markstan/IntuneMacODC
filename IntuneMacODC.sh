@@ -59,6 +59,10 @@ zip -r $ODCFILENAME /Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/Intune/SideCar
 zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
 zip -r $ODCFILENAME ~/Library/Logs/DiagnosticReports/* -x "*Siri*"
+# MDE attach scenario
+zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/wdavstate\ (securityManagement)/*
+zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/security_management/policy/*
+zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/security_management/current_report/*
 
 # pkg utilities
 #
