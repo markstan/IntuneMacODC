@@ -17,15 +17,23 @@ fi
 
 echo "Creating odc working directory"
 if [ ! -d odc ]
-   then mkdir odc
+	then mkdir odc
+else
+	RAND= $[ $RANDOM % 99999 + 100000 ]
+	mv odc odc_$RAND
+	mkdir odc
 fi
 pushd .
 cd odc
 
-sw_vers > ./sw_vers.txt
+echo -e "************************\n" > ./sw_vers.txt
+echo -e "sw_vers \n\n"              >> ./sw_vers.txt
+sw_vers                             >> ./sw_vers.txt
 zip -r $ODCFILENAME ./sw_vers.txt
 
-uname -a > ./uname_a.txt
+echo -e "************************\n" > ./uname_a.txt
+echo -e "profiles status\n\n"       >> ./uname_a.txt
+uname -a                            >> ./uname_a.txt
 zip -r $ODCFILENAME ./uname_a.txt
 
 echo -e "************************\n" >> ./profiles.txt
@@ -57,24 +65,44 @@ zip -r $ODCFILENAME ~/Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /var/log/*
 zip -r $ODCFILENAME /Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/Intune/SideCar
-zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
+
+if [ -d /usr/local/jamf/bin/jamfAAD ]; then
+     zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
+else 
+	echo "No JAMF folder found. Skipping."
+fi
+
 zip -r $ODCFILENAME ~/Library/Logs/DiagnosticReports/* -x "*Siri*"
+
 # MDE attach scenario
-zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/wdavstate\ (securityManagement)/*
-zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/security_management/policy/*
-zip -r $ODCFILENAME  /Library/Logs/Micrpsoft/Defender/security_management/current_report/*
+if ! type mdatp > /dev/null; then
+    echo -e "Defender not installed. Skipping tests."
+else 
+     zip -r $ODCFILENAME  /Library/Logs/Microsoft/Defender/wdavstate/*
+     zip -r $ODCFILENAME  /Library/Logs/Microsoft/Defender/security_management/policy/*
+     zip -r $ODCFILENAME  /Library/Logs/Microsoft/Defender/security_management/current_report/*
+
+     echo -e "************************\n" > ./mdatp_health.txt
+     echo -e "mdatp health\n\n" >> ./mdatp_health.txt
+     mdatp health >> ./mdatp_health.txt
+     zip -r $ODCFILENAME ./mdatp_health.txt
+fi
 
 # pkg utilities
 #
 #
+echo -e "************************\n"  > ./pkgutil_pkgs.txt
+echo -e "pkgutil --pkgs \n\n"        >> ./pkgutil_pkgs.txt
+pkgutil --pkgs                       >> ./pkgutil_pkgs.txt
 
-pkgutil --pkgs > ./pkgutil_pkgs.txt
-pkgutil --pkgs | grep - v com.apple.pkg.MAContent10 | while read x; do (pkgutil --pkg-info $x; echo -e ""); done > ./pkgutil_info.txt
+echo -e "************************\n"                   > ./pkgutil_info.txt
+echo -e "pkgutil --pkg-info <package name\n\n"        >> ./ppkgutil_info.txt
+pkgutil --pkgs | grep -v com.apple.pkg.MAContent10 | sort | while read x; do (pkgutil --pkg-info $x; echo -e ""); done >> ./pkgutil_info.txt
 
 zip -r $ODCFILENAME ./pkgutil_pkgs.txt
 zip -r $ODCFILENAME ./pkgutil_info.txt
 
-echo "Gathering syslogs.  This may take a minute."
+echo "Gathering syslogs.  This may take a few minutes."
 
 # Syslogs
 log show --style syslog --info --debug --predicate 'process CONTAINS[c] "downloadd" ' --last 30d  >> ./syslog_downloadd.log
