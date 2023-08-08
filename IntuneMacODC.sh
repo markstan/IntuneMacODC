@@ -19,7 +19,7 @@ echo "Creating odc working directory"
 if [ ! -d odc ]
 	then mkdir odc
 else
-	RAND= $[ $RANDOM % 99999 + 100000 ]
+	RAND=$[ $RANDOM % 99999 + 100000 ]
 	mv odc odc_$RAND
 	mkdir odc
 fi
