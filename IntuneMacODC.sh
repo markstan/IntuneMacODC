@@ -219,6 +219,7 @@ zip -r $ODCFILENAME ./Last_Output.txt
 rm ./SystemReport.spx
 rm ./*.txt
 rm ./*.log
+rm ./profiles*.xml
 
 # display window in Finder
 open .
