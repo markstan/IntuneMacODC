@@ -32,31 +32,37 @@ sw_vers                             >> ./sw_vers.txt
 zip -r $ODCFILENAME ./sw_vers.txt
 
 echo -e "************************\n" > ./uname_a.txt
-echo -e "profiles status\n\n"       >> ./uname_a.txt
+echo -e "uname -a\n\n"              >> ./uname_a.txt
 uname -a                            >> ./uname_a.txt
 zip -r $ODCFILENAME ./uname_a.txt
 
-echo -e "************************\n" >> ./profiles.txt
-echo -e "profiles status\n\n" >> ./profiles.txt
-profiles status >> ./profiles.txt
+echo -e "************************\n"  > ./profiles.txt
+echo -e "profiles status\n\n"        >> ./profiles.txt
+profiles status                      >> ./profiles.txt
+profiles status -output stdout-xml    > ./profiles_status.xml
 
 echo -e "************************\n" >> ./profiles.txt
-echo -e "profiles list\n\n" >> ./profiles.txt
-profiles list >> ./profiles.txt
+echo -e "profiles list\n\n"          >> ./profiles.txt
+profiles list                        >> ./profiles.txt
+profiles list -output stdout-xml      > ./profiles_list.xml
 
 echo -e "************************\n" >> ./profiles.txt
-echo -e "profiles show\n\n" >> ./profiles.txt
-profiles show >> ./profiles.txt
+echo -e "profiles show\n\n"          >> ./profiles.txt
+profiles show                        >> ./profiles.txt
+profiles show  -output stdout-xml     > ./profiles_show.xml
 
 echo -e "************************\n" >> ./profiles.txt
 echo -e "profiles list -verbose\n\n" >> ./profiles.txt
-profiles list -verbose >> ./profiles.txt
+profiles list -verbose               >> ./profiles.txt
+profiles list -verbose -output stdout-xml  > ./profiles_list_verbose.xml
 
 echo -e "************************\n" >> ./profiles.txt
 echo -e "profiles show -verbose\n\n" >> ./profiles.txt
-profiles show -verbose >> ./profiles.txt
+profiles show -verbose               >> ./profiles.txt
+profiles show -verbose -output stdout-xml   > ./profiles_show_verbose.xml
 
 zip -r $ODCFILENAME ./profiles.txt
+zip -r $ODCFILENAME ./profiles*.xml
 
 echo "Collecting logs"
 # Gather log directories 
@@ -65,6 +71,10 @@ zip -r $ODCFILENAME ~/Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /var/log/*
 zip -r $ODCFILENAME /Library/Logs/Microsoft/*
 zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/Intune/SideCar
+zip -r $ODCFILENAME ~/Library/Containers/com.microsoft.CompanyPortalMac.ssoextension/Data/Library/Caches/Logs/Microsoft/SSOExtension
+zip -r $ODCFILENAME /Library/Application\ Support/Microsoft/EdgeUpdater/updater.log*
+zip -r $ODCFILENAME /Library/Application\ Support/com.apple.TCC/MDMOverrides.plist
+
 
 if [ -d /usr/local/jamf/bin/jamfAAD ]; then
      zip -r $ODCFILENAME /usr/local/jamf/bin/jamfAAD/*
